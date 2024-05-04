@@ -1,41 +1,38 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const dino = document.getElementById("dino");
-    const cactus = document.getElementById("cactus");
-  
-    let isAlive = true; // Flag to track game status
-  
-    document.addEventListener("keydown", function(event) {
-      if (event.keyCode === 32) {
-        jump();
-      }
-    });
-  
-    function jump() {
-      if (!dino.classList.contains("jump")) {
-        dino.classList.add("jump");
-      }
-      setTimeout(function() {
-        dino.classList.remove("jump");
-      }, 300);
-    }
-  
-    // Function to check for collision and end the game if detected
-    function checkCollision() {
-      let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
+  const dino = document.getElementById("dino");
+  const cactus = document.getElementById("cactus");
+  let isGameOver = false;
+  let score = 0;
+
+  // Function to check for collision and end the game if detected
+  let gameLoop = setInterval(function() {
+      let dinoTop = parseInt(window.getComputedStyle(dino).getPropertyValue("top"));
       let cactusLeft = parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
-  
-      if (cactusLeft < 50 && cactusLeft > 0 && dinoBottom <= 70) {
-        isAlive = false; // Set game status to false
-        clearInterval(gameLoop); // Stop the game loop
-        alert("GAME OVER!!");
+
+      if (cactusLeft < 50 && cactusLeft > 0 && dinoTop >= 140) {
+          clearInterval(gameLoop); // Остановить игровой цикл
+          alert("GAME OVER!!");
+          isGameOver = true; // Установить флаг окончания игры
+          score = 0; // Обнулить счет
+          document.getElementById("score").innerText = score; // Обновить отображение счета
       }
-    }
-  
-    // Game loop
-    let gameLoop = setInterval(function() {
-      if (isAlive) {
-        checkCollision(); // Check for collision only if the game is active
+
+      if (!isGameOver && parseInt(window.getComputedStyle(cactus).getPropertyValue("left")) < 0) {
+          score++; // Увеличиваем счет, если кактус успешно прошел за пределы экрана слева
+          document.getElementById("score").innerText = score; // Обновляем отображение счета
       }
-    }, 10);
+  }, 10);
+
+  document.addEventListener("keydown", function(event) {
+      jump();
   });
- 
+
+  function jump() {
+      if (!isGameOver && dino.classList != "jump") {
+          dino.classList.add("jump");
+          setTimeout(function() {
+              dino.classList.remove("jump");
+          }, 300);
+      }
+  }
+});
